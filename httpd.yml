@@ -1,0 +1,25 @@
+- name: httpd 트리거 설정
+  hosts: all
+  become: true
+  vars_files:
+    vars.yml
+  tasks:
+    - name: 패키지 설치
+      yum:
+        name: httpd
+        state: present
+
+    - name: httpd포트 변경시 핸들러 발생
+      lineinfile:
+        dest: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen\s+'
+        line: Listen {{ webport }}
+      notify:
+        - restarthttpd
+   
+
+  handlers:
+    - name: restarthttpd
+      service:
+        name: httpd
+        state: restarted
